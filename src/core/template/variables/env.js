@@ -32,9 +32,8 @@ const findEnvVar = function({ envVarName }) {
   }
 
   // Try to match environment variable name case-insensitively
-  const envVarNameA = envVarName.toLowerCase()
   const envVar = Object.entries(env).find(
-    ([key]) => key.toLowerCase() === envVarNameA,
+    ([key]) => envVarName.startsWith(key.toLowerCase()),
   )
 
   if (envVar === undefined) {

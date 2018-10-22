@@ -4,6 +4,10 @@ const {
   Buffer: { byteLength },
 } = require('buffer')
 
+const {
+  template: { $$env },
+} = require('../../../template')
+
 const { mapKeys } = require('lodash')
 
 // The `node-fetch` library adds few HTTP request headers, so we add them
@@ -21,9 +25,10 @@ const getFetchRequestHeaders = function({
     'headers.accept': accept = DEFAULT_ACCEPT,
     'headers.accept-encoding': acceptEncoding = DEFAULT_ACCEPT_ENCODING,
     'headers.connection': connection = DEFAULT_CONNECTION,
+    'headers.authorization': authorization = $$env.AUTHORIZATION,
   },
 }) {
-  return { accept, 'accept-encoding': acceptEncoding, connection }
+  return { accept, 'accept-encoding': acceptEncoding, connection, authorization }
 }
 
 const DEFAULT_ACCEPT = '*/*'
