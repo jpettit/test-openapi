@@ -14,16 +14,11 @@ const getNegotiationsParams = function({ spec, operation, params }) {
 const getContentTypeParam = function({ spec, operation, params }) {
   const consumes = getConsumes({ spec, operation })
 
-  if(consumes === undefined) {
+  if (consumes === undefined) {
     return
   }
 
   const consumesA = filterFormDataMimes({ mimes: consumes, params })
-
-  if (consumesA === undefined) {
-    return
-  }
-
   const value = { type: 'string', enum: consumesA }
   return { 'headers.content-type': value }
 }

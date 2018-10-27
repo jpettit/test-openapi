@@ -45,10 +45,9 @@ const getSecDefs = function({ securityDefinitions, securitySchemes }) {
 }
 
 const getSecRefs = function({ security }) {
-  const securityA = security.map(Object.entries)
-  const securityB = [].concat(...securityA)
-  const securityC = uniqBy(securityB, JSON.stringify)
-  return securityC
+  const securityA = security.flatMap(Object.entries)
+  const securityB = uniqBy(securityA, JSON.stringify)
+  return securityB
 }
 
 // Retrieve among the `securityDefinitions`

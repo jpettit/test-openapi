@@ -4,8 +4,8 @@ const { TestOpenApiError } = require('../../../../../errors')
 
 // Operation's method, server and path as a `task.call.method|server|path`
 // parameter
-const getConstants = function({ spec, method, path }) {
-  const serverParam = getServerParam({ spec })
+const getConstants = function({ spec, operation, method, path }) {
+  const serverParam = getServerParam({ spec, operation })
   const methodParam = getMethodParam({ method })
   const pathParam = getPathParam({ path })
 
@@ -13,27 +13,30 @@ const getConstants = function({ spec, method, path }) {
 }
 
 // Retrieve `task.call.server`
-const getServerParam = function({ spec: { host: hostname, basePath } }) {
+const getServerParam = function({
+  spec: { schemes: specSchemes = DEFAULT_SCHEMES, host: hostname, basePath },
+  operation: { schemes = specSchemes },
+}) {
   // Only if OpenAPI `host` is defined
   if (hostname === undefined) {
     return
   }
 
-  // TODO: support `spec.schemes` instead of always using HTTP
-  const value = `http://${hostname}${basePath}`
-  return getConstant({ value, key: 'server' })
+  const servers = schemes.map(scheme => `${scheme}://${hostname}${basePath}`)
+  return { server: { type: 'string', enum: servers } }
 }
+
+const DEFAULT_SCHEMES = ['http']
 
 // Retrieve `task.call.method`
 const getMethodParam = function({ method }) {
-  return getConstant({ value: method, key: 'method' })
+  return { method: { type: 'string', enum: [method] } }
 }
 
 // Retrieve `task.call.path`
 const getPathParam = function({ path }) {
-  const value = getExpressPath({ path })
-  const pathParam = getConstant({ value, key: 'path' })
-  return pathParam
+  const pathA = getExpressPath({ path })
+  return { path: { type: 'string', enum: [pathA] } }
 }
 
 // Transform an OpenAPI path `/path/{variable}` into an Express-style path
@@ -64,10 +67,6 @@ const getExpressVariable = function({ name, path }) {
 // We are sligtly more restrictive as we disallow starting with a digit,
 // to distinguish from URL port.
 const VALID_EXPRESS_PATH_NAME = /^[a-zA-Z_]\w*$/u
-
-const getConstant = function({ value, key }) {
-  return { [key]: { type: 'string', enum: [value] } }
-}
 
 module.exports = {
   getConstants,
